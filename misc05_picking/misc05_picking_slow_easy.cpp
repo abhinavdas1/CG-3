@@ -72,7 +72,7 @@ float camx=10.0,camy=10.0,camz=10.0;
 float camR=17.4;
 
 Vertex* VertsF; //for Face
-GLuint* IdcsF; //for Face
+GLushort* IdcsF; //for Face
 
 GLFWwindow* window;
 
@@ -109,19 +109,19 @@ GLint gZ = 0.0;
 bool animation = false;
 GLfloat phi = 0.0;
 
-void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLuint* &out_Indices, int ObjectId)
+void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLushort* &out_Indices, int ObjectId)
 {
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	bool res = loadOBJ(file, vertices, uvs, normals);
+	bool res = loadOBJ(file, vertices, normals);
 
-	std::vector<unsigned int> indices;
+	std::vector<GLushort> indices;
 	std::vector<glm::vec3> indexed_vertices;
 	std::vector<glm::vec2> indexed_uvs;
 	std::vector<glm::vec3> indexed_normals;
-	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	indexVBO(vertices, normals, indices, indexed_vertices, indexed_normals);
 
 	const size_t vertCount = indexed_vertices.size();
 	const size_t idxCount = indices.size();
@@ -133,7 +133,7 @@ void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLuint* &ou
 		out_Vertices[i].SetNormal(&indexed_normals[i].x);
 		out_Vertices[i].SetColor(&color[0]);
 	}
-	out_Indices = new GLuint[idxCount];
+	out_Indices = new GLushort[idxCount];
 	for (int i = 0; i < idxCount; i++) {
 		out_Indices[i] = indices[i];
 	}
@@ -248,7 +248,7 @@ void createObjects(void)
     
     std::vector<glm::vec3> normals;
     loadObject("Face.obj",glm::vec4(1.0, 0.0, 0.0, 1.0), VertsF, IdcsF, 2);
-    createVAOs1(VertsF, IdcsF, 2);
+    createVAOs(VertsF, IdcsF, 2);
     VertexBufferSize[2] = sizeof(VertsF);
     
 }
