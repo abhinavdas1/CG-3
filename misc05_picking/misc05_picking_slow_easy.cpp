@@ -72,7 +72,7 @@ float camx=10.0,camy=10.0,camz=10.0;
 float camR=17.4;
 
 Vertex* VertsF; //for Face
-GLushort* IdcsF; //for Face
+GLuint* IdcsF; //for Face
 
 GLFWwindow* window;
 
@@ -109,7 +109,7 @@ GLint gZ = 0.0;
 bool animation = false;
 GLfloat phi = 0.0;
 
-void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLushort* &out_Indices, int ObjectId)
+void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLuint* &out_Indices, int ObjectId)
 {
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
@@ -117,7 +117,7 @@ void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLushort* &
 	std::vector<glm::vec3> normals;
 	bool res = loadOBJ(file, vertices, normals);
 
-	std::vector<GLushort> indices;
+	std::vector<GLuint> indices;
 	std::vector<glm::vec3> indexed_vertices;
 	std::vector<glm::vec2> indexed_uvs;
 	std::vector<glm::vec3> indexed_normals;
@@ -125,6 +125,7 @@ void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLushort* &
 
 	const size_t vertCount = indexed_vertices.size();
 	const size_t idxCount = indices.size();
+    
 
 	// populate output arrays
 	out_Vertices = new Vertex[vertCount];
@@ -133,7 +134,7 @@ void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLushort* &
 		out_Vertices[i].SetNormal(&indexed_normals[i].x);
 		out_Vertices[i].SetColor(&color[0]);
 	}
-	out_Indices = new GLushort[idxCount];
+	out_Indices = new GLuint[idxCount];
 	for (int i = 0; i < idxCount; i++) {
 		out_Indices[i] = indices[i];
 	}
@@ -159,7 +160,7 @@ void createObjects(void)
 	};
 
 	VertexBufferSize[0] = sizeof(CoordVerts);	// ATTN: this needs to be done for each hand-made object with the ObjectID (subscript)
-	createVAOs(CoordVerts, NULL, 0);
+	createVAOs1(CoordVerts, NULL, 0);
 	
 	//-- GRID --//
 	
@@ -235,8 +236,8 @@ void createObjects(void)
         
     };
     VertexBufferSize[1] = sizeof(grid1);
-    unsigned short Indices1[]={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,52,53,54,55,56,57,58,59,60,61,62,63};
-    createVAOs(grid1, Indices1, 1);
+    unsigned int Indices1[]={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,52,53,54,55,56,57,58,59,60,61,62,63};
+    createVAOs1(grid1, Indices1, 1);
     
     //-- .OBJs --//
     
@@ -247,9 +248,9 @@ void createObjects(void)
 	//createVAOs(Verts, Idcs, ObjectID);
     
     std::vector<glm::vec3> normals;
-    loadObject("Face.obj",glm::vec4(1.0, 0.0, 0.0, 1.0), VertsF, IdcsF, 2);
-    createVAOs(VertsF, IdcsF, 2);
-    VertexBufferSize[2] = sizeof(VertsF);
+    loadObject("Face1.obj",glm::vec4(0.5, 0.5, 0.0, 1.0), VertsF, IdcsF, 2);
+    createVAOs1(VertsF, IdcsF, 2);
+
     
 }
 
@@ -445,7 +446,7 @@ void initOpenGL(void)
 	createObjects();
 }
 
-void createVAOs(Vertex Vertices[], unsigned short Indices[], int ObjectId) {
+void createVAOs(Vertex Vertices[], unsigned int Indices[], int ObjectId) {
 
 	GLenum ErrorCheckValue = glGetError();
 	const size_t VertexSize = sizeof(Vertices[0]);

@@ -21,7 +21,7 @@ bool getSimilarVertexIndex(
 	glm::vec3 & in_normal, 
 	std::vector<glm::vec3> & out_vertices,
 	std::vector<glm::vec3> & out_normals,
-	unsigned short & result
+	unsigned int & result
 ){
 	// Lame linear search
 	for ( unsigned int i=0; i<out_vertices.size(); i++ ){
@@ -52,10 +52,10 @@ struct PackedVertex{
 
 bool getSimilarVertexIndex_fast( 
 	PackedVertex & packed, 
-	std::map<PackedVertex,unsigned short> & VertexToOutIndex,
-	unsigned short & result
+	std::map<PackedVertex,unsigned int> & VertexToOutIndex,
+	unsigned int & result
 ){
-	std::map<PackedVertex,unsigned short>::iterator it = VertexToOutIndex.find(packed);
+	std::map<PackedVertex,unsigned int>::iterator it = VertexToOutIndex.find(packed);
 	if ( it == VertexToOutIndex.end() ){
 		return false;
 	}else{
@@ -68,12 +68,12 @@ void indexVBO(
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec3> & in_normals,
 
-	std::vector<unsigned short> & out_indices,
+	std::vector<unsigned int> & out_indices,
 	std::vector<glm::vec3> & out_vertices,
 
 	std::vector<glm::vec3> & out_normals
 ){
-	std::map<PackedVertex,unsigned short> VertexToOutIndex;
+	std::map<PackedVertex,unsigned int> VertexToOutIndex;
 
 	// For each input vertex
 	for ( unsigned int i=0; i<in_vertices.size(); i++ ){
@@ -82,7 +82,7 @@ void indexVBO(
 		
 
 		// Try to find a similar vertex in out_XXXX
-		unsigned short index;
+		unsigned int index;
 		bool found = getSimilarVertexIndex_fast( packed, VertexToOutIndex, index);
 
 		if ( found ){ // A similar vertex is already in the VBO, use it instead !
@@ -90,7 +90,7 @@ void indexVBO(
 		}else{ // If not, it needs to be added in the output data.
 			out_vertices.push_back( in_vertices[i]);
 			out_normals .push_back( in_normals[i]);
-			unsigned short newindex = (unsigned short)out_vertices.size() - 1;
+			unsigned int newindex = (unsigned int)out_vertices.size() - 1;
 			out_indices .push_back( newindex );
 			VertexToOutIndex[ packed ] = newindex;
 		}
