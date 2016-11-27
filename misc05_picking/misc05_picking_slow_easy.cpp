@@ -22,6 +22,8 @@ using namespace glm;
 #include <common/controls.hpp>
 #include <common/objloader.hpp>
 #include <common/vboindexer.hpp>
+#include "tga.c"
+#include "tga.h"
 
 #define PI 3.1415
 
@@ -73,6 +75,8 @@ float camR=17.4;
 
 Vertex* VertsF; //for Face
 GLuint* IdcsF; //for Face
+Vertex VertsG[882]; //for Face
+GLuint IdcsG[882]; //for Face
 
 GLFWwindow* window;
 
@@ -85,14 +89,14 @@ std::string gMessage;
 GLuint programID;
 GLuint pickingProgramID;
 
-const GLuint NumObjects = 3;	// ATTN: THIS NEEDS TO CHANGE AS YOU ADD NEW OBJECTS
-GLuint VertexArrayId[NumObjects] = { 0,1,2 };
-GLuint VertexBufferId[NumObjects] = { 0,1,2 };
-GLuint IndexBufferId[NumObjects] = { 0,1,2 };
+const GLuint NumObjects = 4;	// ATTN: THIS NEEDS TO CHANGE AS YOU ADD NEW OBJECTS
+GLuint VertexArrayId[NumObjects] = { 0,1,2,3 };
+GLuint VertexBufferId[NumObjects] = { 0,1,2,3 };
+GLuint IndexBufferId[NumObjects] = { 0,1,2,3 };
 
-size_t NumIndices[NumObjects] = { 0,1,2 };
-size_t VertexBufferSize[NumObjects] = { 0,1.2 };
-size_t IndexBufferSize[NumObjects] = { 0,1,2 };
+size_t NumIndices[NumObjects] = { 0,1,2,3 };
+size_t VertexBufferSize[NumObjects] = { 0,1,2,3 };
+size_t IndexBufferSize[NumObjects] = { 0,1,2,3 };
 
 GLuint MatrixID;
 GLuint ModelMatrixID;
@@ -165,92 +169,128 @@ void createObjects(void)
 	//-- GRID --//
 	
 	// ATTN: create your grid vertices here!
-    Vertex grid1[]=
-    {
-        { { 5.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//1
-        { { 5.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 4.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 4.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 2.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 2.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 1.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 1.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//15
-        { { -5.0, 0.0, -1.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, -1.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, -2.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, -2.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, -3.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, -3.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, -4.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, -4.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -5.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -4.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -4.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -3.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -3.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -2.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -2.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//30
-        { { -1.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -1.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 0.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 0.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 1.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 1.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 2.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 2.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 3.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 3.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 4.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 4.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 5.0, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//43
-        { { 5.0, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 4.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 4.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 3.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 3.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 2.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 2.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 1.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 1.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 0.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { 0.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -0.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -0.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//56
-        { { -1.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -1.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -2.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -2.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -3.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -3.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },//62
-        { { -4.5, 0.0, 5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-        { { -4.5, 0.0, -5.0, 1.0 }, { 1.0, 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0 } },
+    GLuint Indices1[84];
+    Vertex grid1[84];
+    
 
-        
-        
-    };
+    int flag=0;
+    float x=5.0;
+    float z=5.0;
+    for(int i=0; i<40; i++)
+    {
+        if(flag==0)
+        {
+            x=x*-1.0;
+            float coords[]={ x, 0.0, z, 1.0};
+            grid1[i].SetPosition(coords);
+        }
+        else
+        {
+            z=z-0.5;
+            float coords[]={ x, 0.0, z, 1.0};
+            grid1[i].SetPosition(coords);
+        }
+        float colour[]={ 1.0, 1.0, 1.0, 1.0 };
+        grid1[i].SetColor(colour);
+        float norm[]={ 0.0, 0.0, 1.0 };
+        grid1[i].SetNormal(norm);
+        flag=(flag+1)%2;
+        Indices1[i]=i;
+    }
+    x=5.0;
+    z=5.0;
+    for(int i=40; i<80; i++)
+    {
+        if(flag==0)
+        {
+            z=z*-1.0;
+            float coords[]={ x, 0.0, z, 1.0};
+            grid1[i].SetPosition(coords);
+        }
+        else
+        {
+            x=x-0.5;
+            float coords[]={ x, 0.0, z, 1.0};
+            grid1[i].SetPosition(coords);
+        }
+        float colour[]={ 1.0, 1.0, 1.0, 1.0 };
+        grid1[i].SetColor(colour);
+        float norm[]={ 0.0, 0.0, 1.0 };
+        grid1[i].SetNormal(norm);
+        flag=(flag+1)%2;
+        Indices1[i]=i;
+    }
     VertexBufferSize[1] = sizeof(grid1);
-    unsigned int Indices1[]={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,52,53,54,55,56,57,58,59,60,61,62,63};
     createVAOs1(grid1, Indices1, 1);
     
     //-- .OBJs --//
     
     // ATTN: load your models here
-	//Vertex* Verts;
-	//GLushort* Idcs;
-	//loadObject("models/base.obj", glm::vec4(1.0, 0.0, 0.0, 1.0), Verts, Idcs, ObjectID);
-	//createVAOs(Verts, Idcs, ObjectID);
+    //Vertex* Verts;
+    //GLushort* Idcs;
+    //loadObject("models/base.obj", glm::vec4(1.0, 0.0, 0.0, 1.0), Verts, Idcs, ObjectID);
+    //createVAOs(Verts, Idcs, ObjectID);
     
     std::vector<glm::vec3> normals;
     loadObject("Face1.obj",glm::vec4(0.5, 0.5, 0.0, 1.0), VertsF, IdcsF, 2);
     createVAOs1(VertsF, IdcsF, 2);
+    VertexBufferSize[2] = sizeof(VertsF);
+    
+    flag=1;
+    x=5;
+    int count=0;
+    for(float i=5; i>=-5; i=i-0.5)
+    {
+        float y=5*flag;
+        for(int j=0; j<=20; j++)
+        {
+            float coords[]={ i, y, 0.0, 1.0};
+            VertsG[count].SetPosition(coords);
 
+            
+            float colour[]={ 0.0, 1.0, 0.0, 1.0 };
+            VertsG[count].SetColor(colour);
+            float norm[]={ 0.0, 1.0, 0.0 };
+            VertsG[count].SetNormal(norm);
+            count++;
+            if(flag==1)
+                y=y-0.5;
+            else
+                y=y+0.5;
+        }
+        flag=flag*-1;
+        
+    }
+    flag=-1;
+    for(float i=-5; i<=5; i=i+0.5)
+    {
+        float x=5*flag;
+        for(int j=0; j<=20; j++)
+        {
+            float coords[]={ x, i, 0.0, 1.0};
+            VertsG[count].SetPosition(coords);
+            
+            
+            float colour[]={ 0.0, 1.0, 0.0, 1.0 };
+            VertsG[count].SetColor(colour);
+            float norm[]={ 0.0, 1.0, 0.0 };
+            VertsG[count].SetNormal(norm);
+            count++;
+            if(flag==1)
+                x=x-0.5;
+            else
+                x=x+0.5;
+        }
+        flag=flag*-1;
+        
+    }
+
+    for(int i=0; i<count; i++)
+        IdcsG[i]=i;
+    
+    
+    VertexBufferSize[3] = sizeof(VertsG);
+    createVAOs1(VertsG, IdcsG, 3);
     
 }
 
@@ -290,13 +330,23 @@ void renderScene(void)
 		glBindVertexArray(0);
         
         glBindVertexArray(VertexArrayId[1]);
-        glDrawArrays(GL_LINE_STRIP, 0, 64);
+        glDrawArrays(GL_LINE_STRIP, 0, 80);
         glBindVertexArray(1);
         
         glBindVertexArray(VertexArrayId[2]);
-        //        glDrawArrays(GL_Triangles, 0, NumIndices[2]);
+//                glDrawArrays(GL_LINE_STRIP, 0, NumIndices[2]);
         glDrawElements(GL_TRIANGLES, NumIndices[2], GL_UNSIGNED_INT , (void*)0);
         glBindVertexArray(2);
+        
+        glBindVertexArray(VertexArrayId[3]);
+//        //        glDrawArrays(GL_Triangles, 0, NumIndices[2]);
+        glDrawArrays(GL_LINE_STRIP, 0, 882);
+        glBindVertexArray(3);
+        
+        glBindVertexArray(VertexArrayId[3]);
+        //        //        glDrawArrays(GL_Triangles, 0, NumIndices[2]);
+        glDrawArrays(GL_POINTS, 0, 882);
+        glBindVertexArray(3);
         
 	}
 	glUseProgram(0);
