@@ -55,7 +55,7 @@ typedef struct Vertex {
 // function prototypes
 int initWindow(void);
 void initOpenGL(void);
-void loadObject(char*, glm::vec4, Vertex * &, GLushort* &, int);
+void loadObject(char*, glm::vec4, Vertex * &, GLuint* &, int);
 void createVAOs(Vertex[], GLushort[], int);
 void createVAOs1(Vertex[], GLuint[], int);
 void createObjects(void);
@@ -146,7 +146,7 @@ void loadObject(char* file, glm::vec4 color, Vertex * &out_Vertices, GLuint* &ou
 	// set global variables!!
 	NumIndices[ObjectId] = idxCount;
 	VertexBufferSize[ObjectId] = sizeof(out_Vertices[0]) * vertCount;
-	IndexBufferSize[ObjectId] = sizeof(GLushort) * idxCount;
+	IndexBufferSize[ObjectId] = sizeof(GLuint) * idxCount;
 }
 
 
